@@ -11,6 +11,12 @@ Memory Area Read
 memAddress = D0-D32767, E0_0-EF_32767, W0-511, 0-6143  
 Return: bytes()
 
+### fins.write(memAddres, data)
+Memory Area Write  
+memAddress = D0-D32767, E0_0-EF_32767, W0-511, 0-6143  
+data = bytes()  
+Return: fins responce
+
 ### fins.toInt16(data)
 Convert to 16bit data  
 ### fins.toInt32(data)
