@@ -42,4 +42,6 @@ Convert to Double data
 finsudp = fins('192.168.250.1', '0.1.0', '0.10.0')
 data = finsudp.read('E0_0", 10)
 print(finsudp.toInt16(data))
+rcv = finsudp.write('E0_0', data)
+print(rcv)
 ```
