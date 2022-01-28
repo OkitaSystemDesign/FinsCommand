@@ -8,17 +8,26 @@ fins(host, destFinsAddress, sorceFinsAddres)
 # Functions
 ### fins.read(memAddres, size)
 Memory Area Read  
-memAddress = D0-D32767, E0_0-EF_32767, W0-511, 0-6143
+memAddress = D0-D32767, E0_0-EF_32767, W0-511, 0-6143  
 Return: bytes()
 
-### fins.toInt**(data)
-Data Convert  
- toInt16  
- toUInt16  
- toInt32  
- toUInt32  
- toInt64  
- toUInt64  
+### fins.toInt16(data)
+Convert to 16bit data  
+### fins.toInt32(data)
+Convert to 32bit data  
+### fins.toInt64(data)
+Convert to 64bit data  
+### fins.toUInt16(data)
+Convert to Unsigned 16bit data  
+### fins.toUInt32(data)
+Convert to Unsigned 32bit data  
+### fins.toUInt64(data)
+Convert to Unsigned 64bit data  
+### fins.toFloat(data)
+Convert to Float data  
+### fins.toDouble(data)
+Convert to Double data  
+
  return: list
  
 
