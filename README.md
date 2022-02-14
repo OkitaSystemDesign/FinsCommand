@@ -1,6 +1,6 @@
 # finsudp.py
 OMRON FINS protocol UDP connection  
-Memory Area Read
+Memory Area Read Write
 
 # Constructor
 fins(host, destFinsAddress, sorceFinsAddres)
