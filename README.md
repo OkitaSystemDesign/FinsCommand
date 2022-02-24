@@ -45,3 +45,6 @@ print(finsudp.toInt16(data))
 rcv = finsudp.write('E0_0', data)
 print(rcv)
 ```
+
+# Qiita記事
+https://qiita.com/OkitaSystemDesign/items/7a958388d16c162148b2
