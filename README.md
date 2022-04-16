@@ -1,8 +1,6 @@
-#OMRONの通信プロトコルのFINSコマンドをpythonで送る
+# OMRONの通信プロトコルのFINSコマンドをpythonで送る
 FINSコマンドはメッセージサービス用の通信コマンドでPC-PLC間やPLC-デバイス間で使用されています
 ここではpythonを使ってEtherenetでPLCとメッセージ通信するクラスを作りました
-
-https://github.com/OkitaSystemDesign/FinsCommand
 
 ## 環境
 Windows10
