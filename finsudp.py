@@ -1,7 +1,5 @@
-#! /usr/bin/python3.4
-# -*- coding: utf-8 -*-
-
 from datetime import datetime
+from logging import exception
 from socket import *
 import struct
 
@@ -88,10 +86,13 @@ class fins:
             readdata = s.recv(BUFSIZE)
 
             data += readdata[14:]
-            
+        
         s.close()
 
         return data
+            
+                
+
 
     # Memory area write
     def write(self, memaddr, writedata):
@@ -133,7 +134,7 @@ class fins:
 
             if rcv[12] != 0 & rcv[13] != 0:
                 break
-                
+
         s.close()
 
         finsres = rcv[10:]
@@ -309,6 +310,11 @@ class fins:
         return readdata
 
 
+    def toBin(self, data):
+        outdata = bin(int.from_bytes(data, 'big'))
+
+        return outdata
+
     def toInt16(self, data):
         outdata = []
         arydata = bytearray(data)
@@ -397,65 +403,75 @@ class fins:
 
         return b
 
-# Sample
-# インスタンス作成
-finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
-# D100から10CH分のデータを読出し
-data = finsudp.read('D100', 10)
-print (finsudp.toInt16(data))
+if __name__ == "__main__":
+    # Sample
+    # インスタンス作成
+    finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
-# E0_0から上で読み出したデータを10CH分を書込み
-rcv = finsudp.write('E0_0', data)
-print(rcv)
+    # D0から2CH分のデータを読出し ビット表記
+    data = finsudp.read('D0', 2)
+    print (finsudp.toBin(data))
+    print(list(finsudp.toBin(data)[2:]))
 
-# D110から10CH分に55を書込み
-rcv = finsudp.fill('D110', 10, 55)
-print(rcv)
+    # D100から10CH分のデータを読出し
+    data = finsudp.read('D100', 10)
+    print (finsudp.toInt16(data))
 
-# モニタモードに切り替え (0x02=Monitor 0x04=Run)
-rcv = finsudp.run(0x02)
-print(rcv)
+    # E0_0から上で読み出したデータを10CH分を書込み
+    rcv = finsudp.write('E0_0', data)
+    print(rcv)
 
-# プログラムモードに切り替え
-rcv = finsudp.stop()
-print(rcv)
+    # D110から10CH分に55を書込み
+    rcv = finsudp.fill('D110', 10, 55)
+    print(rcv)
 
-# CPUユニット情報の読出し
-rcv = finsudp.ReadUnitData()
-print(rcv)
+    # モニタモードに切り替え (0x02=Monitor 0x04=Run)
+    rcv = finsudp.run(0x02)
+    print(rcv)
 
-# CPUユニットステータスの読出し
-rcv = finsudp.ReadUnitStatus()
-print(rcv)
+    # プログラムモードに切り替え
+    rcv = finsudp.stop()
+    print(rcv)
 
-# サイクルタイム読出し
-rcv = finsudp.ReadCycletime()
-print(rcv)
+    # CPUユニット情報の読出し
+    rcv = finsudp.ReadUnitData()
+    print(rcv)
 
-# 時間情報の読出し
-rcv = finsudp.Clock()
-print(rcv)
+    # CPUユニットステータスの読出し
+    rcv = finsudp.ReadUnitStatus()
+    print(rcv)
 
-# 時間情報の書込み（PCの時間を書込み）
-rcv = finsudp.SetClock(datetime.now())
-print(rcv)
+    # サイクルタイム読出し
+    rcv = finsudp.ReadCycletime()
+    print(rcv)
 
-# 異常解除
-rcv = finsudp.ErrorClear()
-print(rcv)
+    # 時間情報の読出し
+    rcv = finsudp.Clock()
+    print(rcv)
 
-# 異常履歴の読出し 最新10件
-rcv = finsudp.ErrorLogRead()
-print(rcv)
+    # 時間情報の書込み（PCの時間を書込み）
+    rcv = finsudp.SetClock(datetime.now())
+    print(rcv)
 
-# 異常履歴のクリア
-rcv = finsudp.ErrorLogClear()
-print(rcv)
+    # 異常解除
+    rcv = finsudp.ErrorClear()
+    print(rcv)
+
+    # 異常履歴の読出し 最新10件
+    rcv = finsudp.ErrorLogRead()
+    print(rcv)
+
+    # 異常履歴のクリア
+    rcv = finsudp.ErrorLogClear()
+    print(rcv)
 
 
-# その他のFINSコマンドを送信するときはこちら
-# 例）0x05 0x01 0x01 CPUユニット情報の読出し
-cmd = bytearray([0x05,0x01])
-rcv = finsudp.SendCommand(cmd)
-print(rcv)
+    # その他のFINSコマンドを送信するときはこちら
+    # 例）0x05 0x01 0x01 CPUユニット情報の読出し
+    cmd = bytearray([0x05,0x01])
+    rcv = finsudp.SendCommand(cmd)
+    print(rcv)
+
+
+
