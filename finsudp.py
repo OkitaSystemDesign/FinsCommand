@@ -57,7 +57,6 @@ class fins:
     # Memory area read
     def read(self, memaddr, readsize):
         s = socket(AF_INET, SOCK_DGRAM)
-        s.bind(('', self.port))
         s.settimeout(2)
 
         finsFrame = self.finsheader()
@@ -89,6 +88,8 @@ class fins:
             readdata = s.recv(BUFSIZE)
 
             data += readdata[14:]
+            
+        s.close()
 
         return data
 
@@ -99,7 +100,6 @@ class fins:
         writeWordSize = len(writedata) // 2
         
         s = socket(AF_INET, SOCK_DGRAM)
-        s.bind(('', self.port))
         s.settimeout(2)
 
         finsFrame = self.finsheader()
@@ -133,6 +133,8 @@ class fins:
 
             if rcv[12] != 0 & rcv[13] != 0:
                 break
+                
+        s.close()
 
         finsres = rcv[10:]
 
