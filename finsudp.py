@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import exception
 from socket import *
 import struct
 
