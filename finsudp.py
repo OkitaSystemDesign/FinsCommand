@@ -333,7 +333,7 @@ class fins:
         
         return outdata
 
-    def toInt32(self, data):
+    def toInt32_old(self, data):
         outdata = []
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 4):
@@ -341,13 +341,28 @@ class fins:
             outdata += (struct.unpack('>i',tmpdata))
         
         return outdata
-            
+
+    def toInt32(self, data):
+        outdata = []
+        arydata = bytearray(data)
+        for idx in range(0, len(arydata), 4):
+            tmpdata = arydata[idx:idx+4]
+            a = tmpdata[::-1]
+            a[0],a[1] = a[1],a[0]
+            a[2],a[3] = a[3],a[2]
+            outdata += (struct.unpack('>i',a))
+
+        return outdata
+
     def toUInt32(self, data):
         outdata = []
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 4):
             tmpdata = arydata[idx:idx+4]
-            outdata += (struct.unpack('>I',tmpdata))
+            a = tmpdata[::-1]
+            a[0],a[1] = a[1],a[0]
+            a[2],a[3] = a[3],a[2]
+            outdata += (struct.unpack('>I',a))
         
         return outdata
 
@@ -356,16 +371,26 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 8):
             tmpdata = arydata[idx:idx+8]
-            outdata += (struct.unpack('>q',tmpdata))
-        
-        return outdata
+            a = tmpdata[::-1]
+            a[0],a[1] = a[1],a[0]
+            a[2],a[3] = a[3],a[2]
+            a[4],a[5] = a[5],a[4]
+            a[6],a[7] = a[7],a[6]
+            outdata += (struct.unpack('>q',a))
 
+        return outdata
+        
     def toUInt64(self, data):
         outdata = []
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 8):
             tmpdata = arydata[idx:idx+8]
-            outdata += (struct.unpack('>Q',tmpdata))
+            a = tmpdata[::-1]
+            a[0],a[1] = a[1],a[0]
+            a[2],a[3] = a[3],a[2]
+            a[4],a[5] = a[5],a[4]
+            a[6],a[7] = a[7],a[6]
+            outdata += (struct.unpack('>Q',a))
         
         return outdata
 
@@ -377,8 +402,8 @@ class fins:
             a = tmpdata[::-1]
             a[0],a[1] = a[1],a[0]
             a[2],a[3] = a[3],a[2]
-
             outdata += (struct.unpack('>f', a))
+
         return outdata
 
     def toDouble(self, data):
@@ -391,8 +416,8 @@ class fins:
             a[2],a[3] = a[3],a[2]
             a[4],a[5] = a[5],a[4]
             a[6],a[7] = a[7],a[6]
-
             outdata += (struct.unpack('>d', a))
+
         return outdata
 
     def toString(self, data):
@@ -411,21 +436,55 @@ if __name__ == "__main__":
     # インスタンス作成
     finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
-    # D0から2CH分のデータを読出し ビット表記
-    data = finsudp.read('D0', 2)
-    print (finsudp.toBin(data))
+    # D1000から1CH分のデータを読出し ビット表記
+    data = finsudp.read('D1000', 1)
+    print(finsudp.toBin(data))
     print(list(finsudp.toBin(data)[2:]))
 
-    # D100から10CH分のデータを読出し
-    data = finsudp.read('D100', 10)
-    print (finsudp.toInt16(data))
+
+    # D1001を読出しINT
+    data = finsudp.read('D1001', 1)
+    print(finsudp.toInt16(data))
+
+    # D1002-D1003を読出しDINT
+    data = finsudp.read('D1002', 2)
+    print(finsudp.toInt32(data))
+
+    # D1004-D1007を読出しLINT
+    data = finsudp.read('D1004', 4)
+    print(finsudp.toInt64(data))
+
+    # D1008を読出しUINT
+    data = finsudp.read('D1008', 1)
+    print(finsudp.toUInt16(data))
+
+    # D1009-D1010を読出しUDINT
+    data = finsudp.read('D1009', 2)
+    print(finsudp.toUInt32(data))
+
+    # D1011-D1014を読出しULINT
+    data = finsudp.read('D1011', 4)
+    print(finsudp.toUInt64(data))
+
+    # D1015-D1016を読出しFLOAT
+    data = finsudp.read('D1015', 2)
+    print(finsudp.toFloat(data))
+
+    # D1017-D1020を読出しDOUBLE
+    data = finsudp.read('D1017', 4)
+    print(finsudp.toDouble(data))
+
+
+    # D1100から10CH分のデータを読出し
+    data = finsudp.read('D1100', 10)
+    print(finsudp.toUInt16(data))
 
     # E0_0から上で読み出したデータを10CH分を書込み
     rcv = finsudp.write('E0_0', data)
     print(rcv)
 
     # D110から10CH分に55を書込み
-    rcv = finsudp.fill('D110', 10, 55)
+    rcv = finsudp.fill('E0_100', 10, 55)
     print(rcv)
 
     # モニタモードに切り替え (0x02=Monitor 0x04=Run)
@@ -474,6 +533,4 @@ if __name__ == "__main__":
     cmd = bytearray([0x05,0x01])
     rcv = finsudp.SendCommand(cmd)
     print(rcv)
-
-
 
