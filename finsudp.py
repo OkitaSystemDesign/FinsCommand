@@ -358,6 +358,8 @@ class fins:
             tmpdata = arydata[idx:idx+8]
             outdata += (struct.unpack('>q',tmpdata))
         
+        return outdata
+
     def toUInt64(self, data):
         outdata = []
         arydata = bytearray(data)
