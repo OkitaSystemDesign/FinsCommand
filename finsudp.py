@@ -346,10 +346,8 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 4):
             tmpdata = arydata[idx:idx+4]
-            a = tmpdata[::-1]
-            a[0],a[1] = a[1],a[0]
-            a[2],a[3] = a[3],a[2]
-            outdata += (struct.unpack('>i',a))
+            tmpdata[0:2], tmpdata[2:4] = tmpdata[2:4], tmpdata[0:2]
+            outdata += (struct.unpack('>i',tmpdata))
 
         return outdata
 
@@ -358,10 +356,8 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 4):
             tmpdata = arydata[idx:idx+4]
-            a = tmpdata[::-1]
-            a[0],a[1] = a[1],a[0]
-            a[2],a[3] = a[3],a[2]
-            outdata += (struct.unpack('>I',a))
+            tmpdata[0:2], tmpdata[2:4] = tmpdata[2:4], tmpdata[0:2]
+            outdata += (struct.unpack('>I',tmpdata))
         
         return outdata
 
@@ -370,12 +366,8 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 8):
             tmpdata = arydata[idx:idx+8]
-            a = tmpdata[::-1]
-            a[0],a[1] = a[1],a[0]
-            a[2],a[3] = a[3],a[2]
-            a[4],a[5] = a[5],a[4]
-            a[6],a[7] = a[7],a[6]
-            outdata += (struct.unpack('>q',a))
+            tmpdata[0:2],tmpdata[2:4],tmpdata[4:6],tmpdata[6:8] = tmpdata[6:8],tmpdata[4:6],tmpdata[2:4],tmpdata[0:2]
+            outdata += (struct.unpack('>q',tmpdata))
 
         return outdata
         
@@ -384,12 +376,8 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 8):
             tmpdata = arydata[idx:idx+8]
-            a = tmpdata[::-1]
-            a[0],a[1] = a[1],a[0]
-            a[2],a[3] = a[3],a[2]
-            a[4],a[5] = a[5],a[4]
-            a[6],a[7] = a[7],a[6]
-            outdata += (struct.unpack('>Q',a))
+            tmpdata[0:2],tmpdata[2:4],tmpdata[4:6],tmpdata[6:8] = tmpdata[6:8],tmpdata[4:6],tmpdata[2:4],tmpdata[0:2]
+            outdata += (struct.unpack('>Q',tmpdata))
         
         return outdata
 
@@ -398,10 +386,8 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 4):
             tmpdata = arydata[idx:idx+4]
-            a = tmpdata[::-1]
-            a[0],a[1] = a[1],a[0]
-            a[2],a[3] = a[3],a[2]
-            outdata += (struct.unpack('>f', a))
+            tmpdata[0:2], tmpdata[2:4] = tmpdata[2:4], tmpdata[0:2]
+            outdata += (struct.unpack('>f', tmpdata))
 
         return outdata
 
@@ -410,12 +396,8 @@ class fins:
         arydata = bytearray(data)
         for idx in range(0, len(arydata), 8):
             tmpdata = arydata[idx:idx+8]
-            a = tmpdata[::-1]
-            a[0],a[1] = a[1],a[0]
-            a[2],a[3] = a[3],a[2]
-            a[4],a[5] = a[5],a[4]
-            a[6],a[7] = a[7],a[6]
-            outdata += (struct.unpack('>d', a))
+            tmpdata[0:2],tmpdata[2:4],tmpdata[4:6],tmpdata[6:8] = tmpdata[6:8],tmpdata[4:6],tmpdata[2:4],tmpdata[0:2]
+            outdata += (struct.unpack('>d', tmpdata))
 
         return outdata
 
@@ -533,3 +515,4 @@ if __name__ == "__main__":
     rcv = finsudp.SendCommand(cmd)
     print(rcv)
 
+    
