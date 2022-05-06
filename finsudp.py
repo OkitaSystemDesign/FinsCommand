@@ -297,11 +297,9 @@ class fins:
     # Send fins command 
     def SendCommand(self, FinsCommand):
         s = socket(AF_INET, SOCK_DGRAM)
-        s.bind(('', self.port))
         s.settimeout(2)
 
         finsFrame = self.finsheader() + FinsCommand
-        #finsFrame.extend(FinsCommand)
 
         s.sendto(finsFrame, self.addr)
         readdata = s.recv(BUFSIZE)
@@ -310,7 +308,7 @@ class fins:
 
 
     def toBin(self, data):
-        outdata = bin(int.from_bytes(data, 'big'))
+        outdata = format(int.from_bytes(data, 'big'), 'b')
 
         return outdata
 
@@ -420,8 +418,8 @@ if __name__ == "__main__":
     # D1000から1CH分のデータを読出し ビット表記
     data = finsudp.read('D1000', 1)
     print(finsudp.toBin(data))
-    print(list(finsudp.toBin(data)[2:]))
-
+    print(list(finsudp.toBin(data)))
+    print(finsudp.toBin(data).rjust(16,"0"))
 
     # D1001を読出しINT
     data = finsudp.read('D1001', 1)
@@ -515,4 +513,3 @@ if __name__ == "__main__":
     rcv = finsudp.SendCommand(cmd)
     print(rcv)
 
-    
