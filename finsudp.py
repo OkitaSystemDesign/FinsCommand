@@ -405,7 +405,8 @@ class fins:
             s[i] = data[i+1]
             s[i+1] = data[i]
         
-        b = bytes(s).decode("utf-8").replace("\00","")
+        idx = s.index(0)
+        b = bytes(s[:idx]).decode("utf-8")
 
         return b
 
@@ -452,6 +453,10 @@ if __name__ == "__main__":
     # D1017-D1020を読出しDOUBLE
     data = finsudp.read('D1017', 4)
     print(finsudp.toDouble(data))
+
+    # D1021-D1025を読出しDOUBLE
+    data = finsudp.read('D1021', 5)
+    print(finsudp.toString(data))
 
 
     # D1100から10CH分のデータを読出し
