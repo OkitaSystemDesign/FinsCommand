@@ -158,17 +158,113 @@ print (finsudp.toInt16(data))
 
 ## サンプル
 ```python
-# D100から10CH分のデータを読出し
-data = finsudp.read('D100', 10)
-print (finsudp.toInt16(data))
+# Sample
+# インスタンス作成
+finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
-出力
-> [1, 2, 500, 1000, 30000, 32767, -1, 0, 0, 0]
+# D1000から1CH分のデータを読出し ビット表記
+data = finsudp.read('D1000', 1)
+print(finsudp.toBin(data))
+print(list(finsudp.toBin(data)))
+print(finsudp.toBin(data).rjust(16,"0"))
+
+# D1001を読出しINT
+data = finsudp.read('D1001', 1)
+print(finsudp.toInt16(data))
+
+# D1002-D1003を読出しDINT
+data = finsudp.read('D1002', 2)
+print(finsudp.toInt32(data))
+
+# D1004-D1007を読出しLINT
+data = finsudp.read('D1004', 4)
+print(finsudp.toInt64(data))
+
+# D1008を読出しUINT
+data = finsudp.read('D1008', 1)
+print(finsudp.toUInt16(data))
+
+# D1009-D1010を読出しUDINT
+data = finsudp.read('D1009', 2)
+print(finsudp.toUInt32(data))
+
+# D1011-D1014を読出しULINT
+data = finsudp.read('D1011', 4)
+print(finsudp.toUInt64(data))
+
+# D1015-D1016を読出しFLOAT
+data = finsudp.read('D1015', 2)
+print(finsudp.toFloat(data))
+
+# D1017-D1020を読出しDOUBLE
+data = finsudp.read('D1017', 4)
+print(finsudp.toDouble(data))
+
+# D1021-D1025を読出しDOUBLE
+data = finsudp.read('D1021', 5)
+print(finsudp.toString(data))
+
+
+# D1100から10CH分のデータを読出し
+data = finsudp.read('D1100', 10)
+print(finsudp.toUInt16(data))
+
+# E0_0から上で読み出したデータを10CH分を書込み
+rcv = finsudp.write('E0_0', data)
+print(rcv)
+
+# D110から10CH分に55を書込み
+rcv = finsudp.fill('E0_100', 10, 55)
+print(rcv)
+
+# モニタモードに切り替え (0x02=Monitor 0x04=Run)
+rcv = finsudp.run(0x02)
+print(rcv)
+
+# プログラムモードに切り替え
+rcv = finsudp.stop()
+print(rcv)
+
+# CPUユニット情報の読出し
+rcv = finsudp.ReadUnitData()
+print(rcv)
+
+# CPUユニットステータスの読出し
+rcv = finsudp.ReadUnitStatus()
+print(rcv)
+
+# サイクルタイム読出し
+rcv = finsudp.ReadCycletime()
+print(rcv)
+
+# 時間情報の読出し
+rcv = finsudp.Clock()
+print(rcv)
+
+# 時間情報の書込み（PCの時間を書込み）
+rcv = finsudp.SetClock(datetime.now())
+print(rcv)
+
+# 異常解除
+rcv = finsudp.ErrorClear()
+print(rcv)
+
+# 異常履歴の読出し 最新10件
+rcv = finsudp.ErrorLogRead()
+print(rcv)
+
+# 異常履歴のクリア
+rcv = finsudp.ErrorLogClear()
+print(rcv)
+
+
+# その他のFINSコマンドを送信するときはこちら
+# 例）0x05 0x01 0x01 CPUユニット情報の読出し
+cmd = bytearray([0x05,0x01])
+rcv = finsudp.SendCommand(cmd)
+print(rcv)
+
 ```
-
-
-
-
 
 # Qiita記事
 https://qiita.com/OkitaSystemDesign/items/7a958388d16c162148b2
