@@ -164,66 +164,66 @@ finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
 # D1000から1CH分のデータを読出し ビット表記
 data = finsudp.read('D1000', 1)
-print(finsudp.toBin(data))
-print(list(finsudp.toBin(data)))
-print(finsudp.toBin(data).rjust(16,"0"))
+print(finsudp.toBin(data))                  # out> 11110000011
+print(list(finsudp.toBin(data)))            # out> ['1', '1', '1', '1', '0', '0', '0', '0', '0', '1', '1']
+print(finsudp.toBin(data).rjust(16,"0"))    # out> 0000011110000011
 
 # D1001を読出しINT
 data = finsudp.read('D1001', 1)
-print(finsudp.toInt16(data))
+print(finsudp.toInt16(data))                #out> [2229]
 
 # D1002-D1003を読出しDINT
 data = finsudp.read('D1002', 2)
-print(finsudp.toInt32(data))
+print(finsudp.toInt32(data))                # out> [-99694]
 
 # D1004-D1007を読出しLINT
 data = finsudp.read('D1004', 4)
-print(finsudp.toInt64(data))
+print(finsudp.toInt64(data))                # out> [-19999999694]
 
 # D1008を読出しUINT
 data = finsudp.read('D1008', 1)
-print(finsudp.toUInt16(data))
+print(finsudp.toUInt16(data))               # out> [2233]
 
 # D1009-D1010を読出しUDINT
 data = finsudp.read('D1009', 2)
-print(finsudp.toUInt32(data))
+print(finsudp.toUInt32(data))               # out> [100217]
 
 # D1011-D1014を読出しULINT
 data = finsudp.read('D1011', 4)
-print(finsudp.toUInt64(data))
+print(finsudp.toUInt64(data))               # out> [2000000149]
 
 # D1015-D1016を読出しFLOAT
 data = finsudp.read('D1015', 2)
-print(finsudp.toFloat(data))
+print(finsudp.toFloat(data))                # out> [229.90484619140625]
 
 # D1017-D1020を読出しDOUBLE
 data = finsudp.read('D1017', 4)
-print(finsudp.toDouble(data))
+print(finsudp.toDouble(data))               # out> [230.89999999999117]
 
-# D1021-D1025を読出しDOUBLE
+# D1021-D1025を読出しSTRING
 data = finsudp.read('D1021', 5)
-print(finsudp.toString(data))
+print(finsudp.toString(data))               # out> ABCD2229
 
 
 # D1100から10CH分のデータを読出し
 data = finsudp.read('D1100', 10)
-print(finsudp.toUInt16(data))
+print(finsudp.toUInt16(data))               # out> [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # E0_0から上で読み出したデータを10CH分を書込み
 rcv = finsudp.write('E0_0', data)
-print(rcv)
+print(rcv)                                  # out> b'\x01\x02\x00\x00'
 
 # D110から10CH分に55を書込み
 rcv = finsudp.fill('E0_100', 10, 55)
-print(rcv)
+print(rcv)                                 # out> b'\x01\x03\x00\x00'
 
 # モニタモードに切り替え (0x02=Monitor 0x04=Run)
 rcv = finsudp.run(0x02)
-print(rcv)
+print(rcv)                                 # out> b'\x04\x01\x00\x00'
 
 # プログラムモードに切り替え
 rcv = finsudp.stop()
-print(rcv)
+print(rcv)                                 # out> b'\x04\x02\x00\x00'
 
 # CPUユニット情報の読出し
 rcv = finsudp.ReadUnitData()
