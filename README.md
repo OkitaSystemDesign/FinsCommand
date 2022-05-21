@@ -145,6 +145,8 @@ print (finsudp.toInt16(data))
 
 |  メソッド名  |  変換するデータの長さ  |
 | --- | --- |
+| toBin  | ビット列 |
+| WordtoBin  | 16ビット単位のビット列 |
 | toInt16  | 16bit数値 |
 | toUInt16 | 16bit符号なし |
 | toInt32 | 32bit数値 |
@@ -162,11 +164,29 @@ print (finsudp.toInt16(data))
 # インスタンス作成
 finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
+# 0CHから5CH分読出し  ビット表記
+data = finsudp.read('0', 1)
+print(finsudp.toBin(data))                  # ゼロサプレス表記
+print(finsudp.WordToBin(data))              # ゼロ埋め表記
+print(list(finsudp.WordToBin(data)))        # ゼロ埋めのリスト
+
+# W0から5CH分読出し  ビット表記
+data = finsudp.read('W0', 2)
+print(finsudp.toBin(data))                # out> 100010000000000010010
+print(finsudp.WordToBin(data))            # out> 00000000000100010000000000010010
+print(list(finsudp.WordToBin(data)))      # out> ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '1', '0']
+
+# H0から5CH分読出し  ビット表記
+data = finsudp.read('H0', 4)
+print(finsudp.toBin(data))
+print(finsudp.WordToBin(data))
+print(list(finsudp.WordToBin(data)))
+
 # D1000から1CH分のデータを読出し ビット表記
 data = finsudp.read('D1000', 1)
 print(finsudp.toBin(data))                  # out> 11110000011
-print(list(finsudp.toBin(data)))            # out> ['1', '1', '1', '1', '0', '0', '0', '0', '0', '1', '1']
-print(finsudp.toBin(data).rjust(16,"0"))    # out> 0000011110000011
+print(finsudp.WordToBin(data))              # out> 0000011110000011
+print(list(finsudp.WordToBin(data)))        # out> ['1', '1', '1', '1', '0', '0', '0', '0', '0', '1', '1']
 
 # D1001を読出しINT
 data = finsudp.read('D1001', 1)

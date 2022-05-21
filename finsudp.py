@@ -28,10 +28,13 @@ class fins:
             moffset = list((int(adr[3:])+offset).to_bytes(2,'big'))
         elif mtype.isdigit():
             mtype = 0xB0
-            moffset = list((int(adr[1:])+offset).to_bytes(2,'big'))
+            moffset = list((int(adr)+offset).to_bytes(2,'big'))
         elif mtype == 'W':
             mtype = 0xB1
-            moffset = list((int(adr[1:]).offset).to_bytes(2,'big'))
+            moffset = list((int(adr[1:])+offset).to_bytes(2,'big'))
+        elif mtype == 'H':
+            mtype = 0xB2
+            moffset = list((int(adr[1:])+offset).to_bytes(2,'big'))
         
         return mtype, moffset
 
@@ -312,6 +315,13 @@ class fins:
 
         return outdata
 
+    def WordToBin(self, data):
+        size = len(data) * 8
+        strBin = format(int.from_bytes(data, 'big'), 'b')
+        outdata = (('0' * (size)) + strBin) [-size:]
+
+        return outdata
+
     def toInt16(self, data):
         outdata = []
         arydata = bytearray(data)
@@ -400,7 +410,7 @@ class fins:
         return outdata
 
     def toString(self, data):
-        s = [0]*len(data)
+        s = [0]*(len(data) + 1)
         for i in range(0, len(data), 2):
             s[i] = data[i+1]
             s[i+1] = data[i]
@@ -416,11 +426,29 @@ if __name__ == "__main__":
     # インスタンス作成
     finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
+    # 0CHから5CH分読出し  ビット表記
+    data = finsudp.read('0', 1)
+    print(finsudp.toBin(data))                  # ゼロサプレス表記
+    print(finsudp.WordToBin(data))              # ゼロ埋め表記
+    print(list(finsudp.WordToBin(data)))        # ゼロ埋めのリスト
+
+    # W0から5CH分読出し  ビット表記
+    data = finsudp.read('W0', 2)
+    print(finsudp.toBin(data))
+    print(finsudp.WordToBin(data))
+    print(list(finsudp.WordToBin(data)))
+
+    # H0から5CH分読出し  ビット表記
+    data = finsudp.read('H0', 4)
+    print(finsudp.toBin(data))
+    print(finsudp.WordToBin(data))
+    print(list(finsudp.WordToBin(data)))
+
     # D1000から1CH分のデータを読出し ビット表記
     data = finsudp.read('D1000', 1)
     print(finsudp.toBin(data))
-    print(list(finsudp.toBin(data)))
-    print(finsudp.toBin(data).rjust(16,"0"))
+    print(finsudp.WordToBin(data))
+    print(list(finsudp.WordToBin(data)))
 
     # D1001を読出しINT
     data = finsudp.read('D1001', 1)
