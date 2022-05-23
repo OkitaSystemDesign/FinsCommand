@@ -93,9 +93,6 @@ class fins:
 
         return data
             
-                
-
-
     # Memory area write
     def write(self, memaddr, writedata):
         if len(writedata) % 2 == 1:
@@ -161,6 +158,44 @@ class fins:
         finsres = rcv[10:]
 
         return finsres
+
+    # Multiple memory area read
+    def multiRead(self, memadr):
+        wd = memadr.replace(' ', '').split(',')
+        wdary = []
+        if len(wd) > 0:
+            for d in wd:
+                memtype, memoffset = self.offset(d, 0)
+                wdary.append(memtype)
+                wdary.append(memoffset[0])
+                wdary.append(memoffset[1])
+                wdary.append(0x00)
+
+        s = socket(AF_INET, SOCK_DGRAM)
+        s.settimeout(2)
+
+        finsFrame = self.finsheader()
+        finsary = bytearray(2 + len(wdary))
+
+        finsary[0] = 0x01
+        finsary[1] = 0x04
+        finsary[2:] = wdary
+
+        finsFrame.extend(finsary)
+
+        s.sendto(finsFrame, self.addr)
+        readdata = s.recv(BUFSIZE)
+
+        s.close()
+
+        data = bytearray(len(wd) * 2)
+        for pos in range(len(wd)):
+            wpos = 14 + pos * 3
+            wdata = readdata[wpos: wpos + 3]
+            data[pos * 2] = wdata[1]
+            data[pos * 2 + 1] = wdata[2]
+
+        return data
 
     # Run
     def run(self, mode):
@@ -410,15 +445,8 @@ class fins:
         return outdata
 
     def toString(self, data):
-        s = [0]*(len(data) + 1)
-        for i in range(0, len(data), 2):
-            s[i] = data[i+1]
-            s[i+1] = data[i]
-        
-        idx = s.index(0)
-        b = bytes(s[:idx]).decode("utf-8")
-
-        return b
+        outdata = data.decode("utf-8")
+        return outdata
 
 
 if __name__ == "__main__":
@@ -498,6 +526,10 @@ if __name__ == "__main__":
     # D110から10CH分に55を書込み
     rcv = finsudp.fill('E0_100', 10, 55)
     print(rcv)
+
+    # 複合読出し D1000,D1010,D1020
+    data = finsudp.multiRead('D1000, D1010, D1020')
+    print(finsudp.toUInt16(data))
 
     # モニタモードに切り替え (0x02=Monitor 0x04=Run)
     rcv = finsudp.run(0x02)
