@@ -241,7 +241,11 @@ print(rcv)                                  # out> b'\x01\x02\x00\x00'
 
 # D110から10CH分に55を書込み
 rcv = finsudp.fill('E0_100', 10, 55)
-print(rcv)                                 # out> b'\x01\x03\x00\x00'
+print(rcv)                                  # out> b'\x01\x03\x00\x00'
+
+# 複合読出し D1000,D1010,D1020
+data = finsudp.multiRead('D1000, D1010, D1020')
+print(finsudp.toUInt16(data))               # out> [456, 1092, 4096]
 
 # モニタモードに切り替え (0x02=Monitor 0x04=Run)
 rcv = finsudp.run(0x02)
