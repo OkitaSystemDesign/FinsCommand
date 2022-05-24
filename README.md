@@ -57,6 +57,12 @@ writeメソッドでアドレスと書き込みデータを渡して書き込み
 rcv = finsudp.fill('D110', 10, 55)
 ```
 連続したメモリエリアに同一のデータを書き込みます
+### multiRead(addresses)
+```python
+# 複合読出し D1000,D1010,D1020
+data = finsudp.multiRead('D1000, D1010, D1020')
+```
+連続したメモリエリアに同一のデータを書き込みます
 ### run(mode)
 ```python
 # 動作モード切り替え (0x02=Monitor 0x04=Run)
