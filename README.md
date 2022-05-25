@@ -105,11 +105,7 @@ rcv = finsudp.ReadCycletime()
 # 時間情報の読出し
 rcv = finsudp.Clock()
 ```
-レスポンス内容
-|  byte数  |  4  | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 内容 | 07 01 00 00  | 年 | 月 | 日 | 時 | 分 | 秒 | 曜日 |
-
+レスポンス type:datetime.datetime
 ### SetClock(datetime)
 ```python
 # 時間情報の書込み（PCの時間を書込み）
