@@ -452,7 +452,7 @@ class fins:
 if __name__ == "__main__":
     # Sample
     # インスタンス作成
-    finsudp = fins('192.168.0.16', '0.16.0', '0.12.0')
+    finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
 
     # 0CHから1CH分読出し  ビット表記
     data = finsudp.read('0', 1)
