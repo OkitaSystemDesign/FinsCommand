@@ -261,7 +261,7 @@ class fins:
 
     # Clock
     def Clock(self):
-        finsary = bytearray(3)
+        finsary = bytearray(2)
         finsary[0] = 0x07
         finsary[1] = 0x01
 
@@ -271,7 +271,7 @@ class fins:
         if finsres[2] == 0x00 and finsres[3] == 0x00:
             dtAry = finsres[4:10]
             dtStr = dtAry.hex()
-            PlcDateTime = datetime.datetime.strptime(dtStr, '%y%m%d%H%M%S')
+            PlcDateTime = datetime.strptime(dtStr, '%y%m%d%H%M%S')
         else:
             PlcDateTime = None
 
@@ -452,27 +452,27 @@ class fins:
 if __name__ == "__main__":
     # Sample
     # インスタンス作成
-    finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
+    finsudp = fins('192.168.0.16', '0.16.0', '0.12.0')
 
-    # 0CHから5CH分読出し  ビット表記
+    # 0CHから1CH分読出し  ビット表記
     data = finsudp.read('0', 1)
     print(finsudp.toBin(data))                  # ゼロサプレス表記
     print(finsudp.WordToBin(data))              # ゼロ埋め表記
     print(list(finsudp.WordToBin(data)))        # ゼロ埋めのリスト
 
-    # W0から5CH分読出し  ビット表記
+    # W0から2CH分読出し  ビット表記
     data = finsudp.read('W0', 2)
     print(finsudp.toBin(data))
     print(finsudp.WordToBin(data))
     print(list(finsudp.WordToBin(data)))
 
-    # H0から5CH分読出し  ビット表記
+    # H0から4CH分読出し  ビット表記
     data = finsudp.read('H0', 4)
     print(finsudp.toBin(data))
     print(finsudp.WordToBin(data))
     print(list(finsudp.WordToBin(data)))
 
-    # D1000から1CH分のデータを読出し ビット表記
+    # D1000を読出し ビット表記
     data = finsudp.read('D1000', 1)
     print(finsudp.toBin(data))
     print(finsudp.WordToBin(data))
