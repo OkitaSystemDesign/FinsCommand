@@ -26,7 +26,7 @@ PLC OMRON CJ/NJ/NX series
 | SendCommand| その他のFINSコマンドを送信 |
 
 ## 使い方
-### オブジェクトの作成
+### オブジェクトの作成 fins(IPAddress, 相手FinsAddress, 自分FinsAddress)
 ```python
 finsudp = fins('192.168.250.1', '0.1.0', '0.10.0')
 ```
