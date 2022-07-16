@@ -1,8 +1,145 @@
 from datetime import datetime
+from logging import exception
 from socket import *
 import struct
 
 BUFSIZE = 4096
+
+class FinsError(Exception):
+    pass
+
+class FinsResponseError(FinsError):
+    def __init__(self, EndCode):
+        self.endcode = EndCode.hex()
+        if self.endcode == "0101":
+            self.message = self.endcode + ": Local node not in network (自ノード ネットワーク未加入)"
+        elif self.endcode == "0102":
+            self.message = self.endcode + ": Token timeout (トークン タイムアウト)"
+        elif self.endcode == "0103":
+            self.message = self.endcode + ": Retries failed (再送オーバー)"
+        elif self.endcode == "0104":
+            self.message = self.endcode + ": Too many send frames (送信許可フレーム数オーバー)"
+        elif self.endcode == "0105":
+            self.message = self.endcode + ": Node address range error (ノードアドレス設定範囲エラー)"
+        elif self.endcode == "0106":
+            self.message = self.endcode + ": Node address duplication (ノードアドレス二重設定エラー)"
+        elif self.endcode == "0201":
+            self.message = self.endcode + ": Destination node not in network (相手ノード ネットワーク未加入)"
+        elif self.endcode == "0202":
+            self.message = self.endcode + ": Unit missing (該当ユニットなし)"
+        elif self.endcode == "0203":
+            self.message = self.endcode + ": Third node missing (第三ノード ネットワーク未加入)"
+        elif self.endcode == "0204":
+            self.message = self.endcode + ": Destination node busy (相手ノード ビジー)"
+        elif self.endcode == "0205":
+            self.message = self.endcode + ": Response timeout (レスポンス タイムアウト)"
+        elif self.endcode == "0301":
+            self.message = self.endcode + ": Communications controller error (通信コントローラ異常)"
+        elif self.endcode == "0302":
+            self.message = self.endcode + ": CPU Unit error (CPUユニット異常)"
+        elif self.endcode == "0303":
+            self.message = self.endcode + ": Controller error (該当コントローラ異常)"
+        elif self.endcode == "0304":
+            self.message = self.endcode + ": Unit number error (ユニット番号設定異常)"
+        elif self.endcode == "0401":
+            self.message = self.endcode + ": Undefined command (未定義コマンド)"
+        elif self.endcode == "0402":
+            self.message = self.endcode + ": Not supported by model/version (サポート外機種/バージョン)"
+        elif self.endcode == "0501":
+            self.message = self.endcode + ": Destination address setting error (相手アドレス設定エラー)"
+        elif self.endcode == "0502":
+            self.message = self.endcode + ": No routing tables (ルーチングテーブル未登録)"
+        elif self.endcode == "0503":
+            self.message = self.endcode + ": Routing table error (ルーチングテーブル異常)"
+        elif self.endcode == "0504":
+            self.message = self.endcode + ": oo many relays (中継回数オーバー)"
+        elif self.endcode == "1001":
+            self.message = self.endcode + ": Command too long (コマンド長オーバー)"
+        elif self.endcode == "1002":
+            self.message = self.endcode + ": Command too short (コマンド長不足)"
+        elif self.endcode == "1003":
+            self.message = self.endcode + ": Elements/data don’t match (要素数/データ数不一致)"
+        elif self.endcode == "1004":
+            self.message = self.endcode + ": Command format error (コマンドフォーマットエラー)"
+        elif self.endcode == "1005":
+            self.message = self.endcode + ": Header error (ヘッダ異常)"
+        elif self.endcode == "1101":
+            self.message = self.endcode + ": Area classification missing (エリア種別なし)"
+        elif self.endcode == "1102":
+            self.message = self.endcode + ": Access size error (アクセスサイズエラー)"
+        elif self.endcode == "1103":
+            self.message = self.endcode + ": Address range error (アドレス範囲外指定エラー)"
+        elif self.endcode == "1104":
+            self.message = self.endcode + ": Address range exceeded (アドレス範囲オーバー)"
+        elif self.endcode == "1106":
+            self.message = self.endcode + ": Program missing (該当プログラム番号なし)"
+        elif self.endcode == "1109":
+            self.message = self.endcode + ": Relational error (相関関係エラー)"
+        elif self.endcode == "110A":
+            self.message = self.endcode + ": Duplicate data access (データ重複エラー)"
+        elif self.endcode == "110B":
+            self.message = self.endcode + ": Response too long (レスポンス長オーバー)"
+        elif self.endcode == "110C":
+            self.message = self.endcode + ": Parameter error (パラメータエラー)"
+        elif self.endcode == "2002":
+            self.message = self.endcode + ": Protected (プロテクト中)"
+        elif self.endcode == "2003":
+            self.message = self.endcode + ": Table missing (登録テーブルなし)"
+        elif self.endcode == "2004":
+            self.message = self.endcode + ": Data missing (検索データなし)"
+        elif self.endcode == "2005":
+            self.message = self.endcode + ": Program missing (該当プログラム番号なし)"
+        elif self.endcode == "2006":
+            self.message = self.endcode + ": File missing (該当ファイルなし)"
+        elif self.endcode == "2007":
+            self.message = self.endcode + ": Data mismatch (照合異常)"
+        elif self.endcode == "2101":
+            self.message = self.endcode + ": Read-only (リードオンリー)"
+        elif self.endcode == "2102":
+            self.message = self.endcode + ": Protected (プロテクト中)"
+        elif self.endcode == "2103":
+            self.message = self.endcode + ": Cannot register (登録不可)"
+        elif self.endcode == "2105":
+            self.message = self.endcode + ": Program missing (該当プログラム番号なし)"
+        elif self.endcode == "2106":
+            self.message = self.endcode + ": File missing (該当ファイルなし)"
+        elif self.endcode == "2107":
+            self.message = self.endcode + ": File name already exists (同一ファイル名あり)"
+        elif self.endcode == "2108":
+            self.message = self.endcode + ": Cannot change (変更不可)"
+        elif self.endcode == "2201":
+            self.message = self.endcode + ": Not possible during execution (運転中のため動作不可)"
+        elif self.endcode == "2202":
+            self.message = self.endcode + ": Not possible while running (停止中)"
+        elif self.endcode == "2203":
+            self.message = self.endcode + ": Wrong PLC mode, PROGRAM mode (本体モードが違う プログラムモード)"
+        elif self.endcode == "2204":
+            self.message = self.endcode + ": Wrong PLC mode, DEBUG mode (本体モードが違う デバッグモード)"
+        elif self.endcode == "2205":
+            self.message = self.endcode + ": Wrong PLC mode, MONITOR mode (本体モードが違う モニタモード)"
+        elif self.endcode == "2206":
+            self.message = self.endcode + ": Wrong PLC mode, RUN mode (本体モードが違う 運転モード)"
+        elif self.endcode == "2207":
+            self.message = self.endcode + ": Specified node not polling node (指定ノードが管理局でない)"
+        elif self.endcode == "2208":
+            self.message = self.endcode + ": Step cannot be executed (ステップが実行不可)"
+        elif self.endcode == "2301":
+            self.message = self.endcode + ": File device missing (ファイル装置なし)"
+        elif self.endcode == "2302":
+            self.message = self.endcode + ": Memory missing (該当メモリなし)"
+        elif self.endcode == "2303":
+            self.message = self.endcode + ": Clock missing (時計なし)"
+        elif self.endcode == "2401":
+            self.message = self.endcode + ": Table missing (登録テーブルなし)"
+
+        else:
+            self.message = self.endcode
+
+        self.message = "FINS ERROR " + self.message
+
+    def __str__(self):
+        return repr(self.message)
+
 
 class fins:
     addr = ()
@@ -11,9 +148,13 @@ class fins:
     port = 9600
     
 
-    def __init__(self, host, destfinsadr, srcfinsadr):
+    def __init__(self, host, destfinsadr="0.0.0", srcfinsadr="0.1.0"):
         self.addr = host, self.port
         self.destfins = destfinsadr.split('.')
+        if destfinsadr=="0.0.0":
+            self.hostadr = host.split('.')
+            self.destfins[1] = self.hostadr[3]
+
         self.srcfins = srcfinsadr.split('.')
 
     def offset(self, adr, offset):
@@ -90,6 +231,9 @@ class fins:
             data += readdata[14:]
         
         s.close()
+
+        if not(readdata[12] == 0 and readdata[13] == 0):
+            raise(FinsResponseError(readdata[12:14]))
 
         return data
             
@@ -451,132 +595,141 @@ class fins:
 
 if __name__ == "__main__":
     # Sample
-    # インスタンス作成
-    finsudp = fins('192.168.0.21', '0.21.0', '0.12.0')
+    try:
+        # インスタンス作成
+        finsudp = fins('192.168.0.16')
 
-    # 0CHから1CH分読出し  ビット表記
-    data = finsudp.read('0', 1)
-    print(finsudp.toBin(data))                  # ゼロサプレス表記
-    print(finsudp.WordToBin(data))              # ゼロ埋め表記
-    print(list(finsudp.WordToBin(data)))        # ゼロ埋めのリスト
+        # 0CHから1CH分読出し  ビット表記
+        data = finsudp.read('0', 1)
+        print(finsudp.toBin(data))                  # ゼロサプレス表記
+        print(finsudp.WordToBin(data))              # ゼロ埋め表記
+        print(list(finsudp.WordToBin(data)))        # ゼロ埋めのリスト
 
-    # W0から2CH分読出し  ビット表記
-    data = finsudp.read('W0', 2)
-    print(finsudp.toBin(data))
-    print(finsudp.WordToBin(data))
-    print(list(finsudp.WordToBin(data)))
+        # W0から2CH分読出し  ビット表記
+        data = finsudp.read('W0', 2)
+        print(finsudp.toBin(data))
+        print(finsudp.WordToBin(data))
+        print(list(finsudp.WordToBin(data)))
 
-    # H0から4CH分読出し  ビット表記
-    data = finsudp.read('H0', 4)
-    print(finsudp.toBin(data))
-    print(finsudp.WordToBin(data))
-    print(list(finsudp.WordToBin(data)))
+        # H0から4CH分読出し  ビット表記
+        data = finsudp.read('H0', 4)
+        print(finsudp.toBin(data))
+        print(finsudp.WordToBin(data))
+        print(list(finsudp.WordToBin(data)))
 
-    # D1000を読出し ビット表記
-    data = finsudp.read('D1000', 1)
-    print(finsudp.toBin(data))
-    print(finsudp.WordToBin(data))
-    print(list(finsudp.WordToBin(data)))
+        # D1000を読出し ビット表記
+        data = finsudp.read('D1000', 1)
+        print(finsudp.toBin(data))
+        print(finsudp.WordToBin(data))
+        print(list(finsudp.WordToBin(data)))
 
-    # D1001を読出しINT
-    data = finsudp.read('D1001', 1)
-    print(finsudp.toInt16(data))
+        # D1001を読出しINT
+        data = finsudp.read('D1001', 1)
+        print(finsudp.toInt16(data))
 
-    # D1002-D1003を読出しDINT
-    data = finsudp.read('D1002', 2)
-    print(finsudp.toInt32(data))
+        # D1002-D1003を読出しDINT
+        data = finsudp.read('D1002', 2)
+        print(finsudp.toInt32(data))
 
-    # D1004-D1007を読出しLINT
-    data = finsudp.read('D1004', 4)
-    print(finsudp.toInt64(data))
+        # D1004-D1007を読出しLINT
+        data = finsudp.read('D1004', 4)
+        print(finsudp.toInt64(data))
 
-    # D1008を読出しUINT
-    data = finsudp.read('D1008', 1)
-    print(finsudp.toUInt16(data))
+        # D1008を読出しUINT
+        data = finsudp.read('D1008', 1)
+        print(finsudp.toUInt16(data))
 
-    # D1009-D1010を読出しUDINT
-    data = finsudp.read('D1009', 2)
-    print(finsudp.toUInt32(data))
+        # D1009-D1010を読出しUDINT
+        data = finsudp.read('D1009', 2)
+        print(finsudp.toUInt32(data))
 
-    # D1011-D1014を読出しULINT
-    data = finsudp.read('D1011', 4)
-    print(finsudp.toUInt64(data))
+        # D1011-D1014を読出しULINT
+        data = finsudp.read('D1011', 4)
+        print(finsudp.toUInt64(data))
 
-    # D1015-D1016を読出しFLOAT
-    data = finsudp.read('D1015', 2)
-    print(finsudp.toFloat(data))
+        # D1015-D1016を読出しFLOAT
+        data = finsudp.read('D1015', 2)
+        print(finsudp.toFloat(data))
 
-    # D1017-D1020を読出しDOUBLE
-    data = finsudp.read('D1017', 4)
-    print(finsudp.toDouble(data))
+        # D1017-D1020を読出しDOUBLE
+        data = finsudp.read('D1017', 4)
+        print(finsudp.toDouble(data))
 
-    # D1021-D1025を読出しDOUBLE
-    data = finsudp.read('D1021', 5)
-    print(finsudp.toString(data))
-
-
-    # D1100から10CH分のデータを読出し
-    data = finsudp.read('D1100', 10)
-    print(finsudp.toUInt16(data))
-
-    # E0_0から上で読み出したデータを10CH分を書込み
-    rcv = finsudp.write('E0_0', data)
-    print(rcv)
-
-    # D110から10CH分に55を書込み
-    rcv = finsudp.fill('E0_100', 10, 55)
-    print(rcv)
-
-    # 複合読出し D1000,D1010,D1020
-    data = finsudp.multiRead('D1000, D1010, D1020')
-    print(finsudp.toUInt16(data))
-
-    # モニタモードに切り替え (0x02=Monitor 0x04=Run)
-    rcv = finsudp.run(0x02)
-    print(rcv)
-
-    # プログラムモードに切り替え
-    rcv = finsudp.stop()
-    print(rcv)
-
-    # CPUユニット情報の読出し
-    rcv = finsudp.ReadUnitData()
-    print(rcv)
-
-    # CPUユニットステータスの読出し
-    rcv = finsudp.ReadUnitStatus()
-    print(rcv)
-
-    # サイクルタイム読出し
-    rcv = finsudp.ReadCycletime()
-    print(rcv)
-
-    # 時間情報の読出し
-    rcv = finsudp.Clock()
-    print(rcv)
-
-    # 時間情報の書込み（PCの時間を書込み）
-    rcv = finsudp.SetClock(datetime.now())
-    print(rcv)
-
-    # 異常解除
-    rcv = finsudp.ErrorClear()
-    print(rcv)
-
-    # 異常履歴の読出し 最新10件
-    rcv = finsudp.ErrorLogRead()
-    print(rcv)
-
-    # 異常履歴のクリア
-    rcv = finsudp.ErrorLogClear()
-    print(rcv)
+        # D1021-D1025を読出しDOUBLE
+        data = finsudp.read('D1021', 5)
+        print(finsudp.toString(data))
 
 
-    # その他のFINSコマンドを送信するときはこちら
-    # 例）0x05 0x01 0x01 CPUユニット情報の読出し
-    cmd = bytearray([0x05,0x01])
-    rcv = finsudp.SendCommand(cmd)
-    print(rcv)
+        # D1100から10CH分のデータを読出し
+        data = finsudp.read('D1100', 10)
+        print(finsudp.toUInt16(data))
+
+        # E0_0から上で読み出したデータを10CH分を書込み
+        rcv = finsudp.write('E0_0', data)
+        print(rcv)
+
+        # D110から10CH分に55を書込み
+        rcv = finsudp.fill('E0_100', 10, 55)
+        print(rcv)
+
+        # 複合読出し D1000,D1010,D1020
+        data = finsudp.multiRead('D1000, D1010, D1020')
+        print(finsudp.toUInt16(data))
+
+        # モニタモードに切り替え (0x02=Monitor 0x04=Run)
+        rcv = finsudp.run(0x02)
+        print(rcv)
+
+        # プログラムモードに切り替え
+        rcv = finsudp.stop()
+        print(rcv)
+
+        # CPUユニット情報の読出し
+        rcv = finsudp.ReadUnitData()
+        print(rcv)
+
+        # CPUユニットステータスの読出し
+        rcv = finsudp.ReadUnitStatus()
+        print(rcv)
+
+        # サイクルタイム読出し
+        rcv = finsudp.ReadCycletime()
+        print(rcv)
+
+        # 時間情報の読出し
+        rcv = finsudp.Clock()
+        print(rcv)
+
+        # 時間情報の書込み（PCの時間を書込み）
+        rcv = finsudp.SetClock(datetime.now())
+        print(rcv)
+
+        # 異常解除
+        rcv = finsudp.ErrorClear()
+        print(rcv)
+
+        # 異常履歴の読出し 最新10件
+        rcv = finsudp.ErrorLogRead()
+        print(rcv)
+
+        # 異常履歴のクリア
+        rcv = finsudp.ErrorLogClear()
+        print(rcv)
+
+
+        # その他のFINSコマンドを送信するときはこちら
+        # 例）0x05 0x01 0x01 CPUユニット情報の読出し
+        cmd = bytearray([0x05,0x01])
+        rcv = finsudp.SendCommand(cmd)
+        print(rcv)
+
+    except FinsError as e:
+        print(e)
+
+    except Exception as e:
+        print(e)
+
+
 
 
 
