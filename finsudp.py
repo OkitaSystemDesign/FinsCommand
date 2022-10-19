@@ -246,9 +246,6 @@ class fins:
         s = socket(AF_INET, SOCK_DGRAM)
         s.settimeout(2)
 
-        finsFrame = self.finsheader()
-        finsary = bytearray(8 + len(writedata))
-
         writenum = writeWordSize // 990
         remainder = writeWordSize % 990
 
@@ -256,10 +253,13 @@ class fins:
         for cnt in range(writenum + 1):
             memtype, memoffset = self.offset(memaddr, cnt * 990)
             if cnt == writenum:
-                rsize = list(int(remainder).to_bytes(2,'big'))
+                size = remainder
             else:
-                rsize = list(int(990).to_bytes(2,'big'))
+                size = 990
                 
+            rsize = list(int(size).to_bytes(2,'big'))
+            finsary = bytearray(8 + size * 2)
+
             finsary[0] = 0x01
             finsary[1] = 0x02
             finsary[2] = memtype
@@ -268,15 +268,17 @@ class fins:
             finsary[5] = 0x00
             finsary[6] = rsize[0]
             finsary[7] = rsize[1]
-            finsary[8:] = writedata
+            pos = cnt * 990 * 2
+            finsary[8:] = writedata[pos: pos + size * 2]
 
+            finsFrame = self.finsheader()
             finsFrame.extend(finsary)
 
             s.sendto(finsFrame, self.addr)
             rcv = s.recv(BUFSIZE)
 
-            if rcv[12] != 0 & rcv[13] != 0:
-                break
+            if not(rcv[12] == 0 and rcv[13] == 0):
+                raise(FinsResponseError(rcv[12:14]))
 
         s.close()
 
@@ -666,6 +668,14 @@ if __name__ == "__main__":
 
         # E0_0から上で読み出したデータを10CH分を書込み
         rcv = finsudp.write('E0_0', data)
+        print(rcv)
+
+        # D1000から1000CH分に連番を書込み
+        l = list(range(1000))
+        writedata = list()
+        for num in range(1000):
+            writedata.extend(list(int(l[num]).to_bytes(2,'big')))
+        rcv = finsudp.write('D1000', writedata)
         print(rcv)
 
         # D110から10CH分に55を書込み
