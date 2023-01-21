@@ -3,9 +3,9 @@ FINSコマンドはメッセージサービス用の通信コマンドでPC-PLC�
 ここではpythonを使ってEtherenetでPLCとメッセージ通信するクラスを作りました
 
 ## 環境
-Windows10
-python3.9
-PLC OMRON CJ/NJ/NX series
+Windows10  
+python3.9  
+PLC OMRON CJ/NJ/NX series  
 
 ## ファンクション一覧
 |  メソッド名  |  内容  |
