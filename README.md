@@ -64,7 +64,7 @@ rcv = finsudp.fill('D110', 10, 55)
 # 複合読出し D1000,D1010,D1020
 data = finsudp.multiRead('D1000, D1010, D1020')
 ```
-連続したメモリエリアに同一のデータを書き込みます
+メモリエリアの複合読出し
 ### run(mode)
 ```python
 # 動作モード切り替え (0x02=Monitor 0x04=Run)
