@@ -148,7 +148,7 @@ class fins:
     port = 9600
     
 
-    def __init__(self, host, destfinsadr="0.0.0", srcfinsadr="0.1.0"):
+    def __init__(self, host, destfinsadr="0.0.0", srcfinsadr="0.127.0"):
         self.addr = host, self.port
         self.destfins = destfinsadr.split('.')
         if destfinsadr=="0.0.0":
@@ -599,7 +599,8 @@ if __name__ == "__main__":
     # Sample
     try:
         # インスタンス作成
-        finsudp = fins('192.168.0.16')
+        # NJ/NXではポート2を使用
+        finsudp = fins('192.168.251.1')   #接続先IPアドレス, 接続先FINSアドレス, 自分FINSアドレス
 
         # 0CHから1CH分読出し  ビット表記
         data = finsudp.read('0', 1)
