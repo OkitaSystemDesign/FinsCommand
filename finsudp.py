@@ -197,12 +197,6 @@ class fins:
 
     # Memory area read
     def read(self, memaddr, readsize):
-        s = socket(AF_INET, SOCK_DGRAM)
-        s.settimeout(2)
-
-        finsFrame = self.finsheader()
-        finsary = bytearray(8)
-
         readnum = readsize // 990
         remainder = readsize % 990
 
@@ -214,6 +208,7 @@ class fins:
             else:
                 rsize = list(int(990).to_bytes(2,'big'))
                 
+            finsary = bytearray(8)
             finsary[0] = 0x01
             finsary[1] = 0x01
             finsary[2] = memtype
@@ -223,18 +218,10 @@ class fins:
             finsary[6] = rsize[0]
             finsary[7] = rsize[1]
 
-            finsFrame.extend(finsary)
+            rcv = finsudp.SendCommand(finsary)
 
-            s.sendto(finsFrame, self.addr)
-            readdata = s.recv(BUFSIZE)
-
-            data += readdata[14:]
+            data += rcv[14:]
         
-        s.close()
-
-        if not(readdata[12] == 0 and readdata[13] == 0):
-            raise(FinsResponseError(readdata[12:14]))
-
         return data
             
     # Memory area write
@@ -242,9 +229,6 @@ class fins:
         if len(writedata) % 2 == 1:
             return
         writeWordSize = len(writedata) // 2
-        
-        s = socket(AF_INET, SOCK_DGRAM)
-        s.settimeout(2)
 
         writenum = writeWordSize // 990
         remainder = writeWordSize % 990
@@ -271,16 +255,7 @@ class fins:
             pos = cnt * 990 * 2
             finsary[8:] = writedata[pos: pos + size * 2]
 
-            finsFrame = self.finsheader()
-            finsFrame.extend(finsary)
-
-            s.sendto(finsFrame, self.addr)
-            rcv = s.recv(BUFSIZE)
-
-            if not(rcv[12] == 0 and rcv[13] == 0):
-                raise(FinsResponseError(rcv[12:14]))
-
-        s.close()
+            rcv = finsudp.SendCommand(finsary)
 
         finsres = rcv[10:]
 
@@ -488,6 +463,11 @@ class fins:
         s.sendto(finsFrame, self.addr)
         readdata = s.recv(BUFSIZE)
 
+        s.close()
+
+        if not(readdata[12] == 0 and readdata[13] == 0):
+            raise(FinsResponseError(readdata[12:14]))
+
         return readdata
 
 
@@ -687,24 +667,12 @@ if __name__ == "__main__":
         data = finsudp.multiRead('D1000, D1010, D1020')
         print(finsudp.toUInt16(data))
 
-        # モニタモードに切り替え (0x02=Monitor 0x04=Run)
-        rcv = finsudp.run(0x02)
-        print(rcv)
-
-        # プログラムモードに切り替え
-        rcv = finsudp.stop()
-        print(rcv)
-
         # CPUユニット情報の読出し
         rcv = finsudp.ReadUnitData()
         print(rcv)
 
         # CPUユニットステータスの読出し
         rcv = finsudp.ReadUnitStatus()
-        print(rcv)
-
-        # サイクルタイム読出し
-        rcv = finsudp.ReadCycletime()
         print(rcv)
 
         # 時間情報の読出し
@@ -715,17 +683,32 @@ if __name__ == "__main__":
         rcv = finsudp.SetClock(datetime.now())
         print(rcv)
 
-        # 異常解除
-        rcv = finsudp.ErrorClear()
-        print(rcv)
+        # 以下CJのみ
+        isCJ = False
+        if isCJ:
+            # モニタモードに切り替え (0x02=Monitor 0x04=Run) (NJ/NXは非対応)
+            rcv = finsudp.run(0x04)
+            print(rcv)
 
-        # 異常履歴の読出し 最新10件
-        rcv = finsudp.ErrorLogRead()
-        print(rcv)
+            # プログラムモードに切り替え (NJ/NXは非対応)
+            rcv = finsudp.stop()
+            print(rcv)
 
-        # 異常履歴のクリア
-        rcv = finsudp.ErrorLogClear()
-        print(rcv)
+            # サイクルタイム読出し (NJ/NXは非対応)
+            rcv = finsudp.ReadCycletime()
+            print(rcv)
+
+            # 異常解除
+            rcv = finsudp.ErrorClear()
+            print(rcv)
+
+            # 異常履歴の読出し 最新10件
+            rcv = finsudp.ErrorLogRead()
+            print(rcv)
+
+            # 異常履歴のクリア
+            rcv = finsudp.ErrorLogClear()
+            print(rcv)
 
 
         # その他のFINSコマンドを送信するときはこちら
