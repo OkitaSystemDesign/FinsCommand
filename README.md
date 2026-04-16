@@ -294,5 +294,8 @@ print(rcv)
 
 ```
 
+# 説明サイト
+https://osdes.com/python/plccomm/finscommand.html
+
 # Qiita記事
 https://qiita.com/OkitaSystemDesign/items/7a958388d16c162148b2
