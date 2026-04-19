@@ -17,8 +17,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/OkitaSystemDesign/finsudp"
-Repository = "https://github.com/OkitaSystemDesign/finsudp"
+Homepage = "https://github.com/OkitaSystemDesign/finscommand"
+Repository = "https://github.com/OkitaSystemDesign/finscommand"
 
 [build-system]
 requires = ["setuptools>=61.0"]
