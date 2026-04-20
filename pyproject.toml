@@ -1,6 +1,6 @@
 [project]
 name = "finscommand"
-version = "0.1.1"
+version = "0.1.2"
 description = "OMRON FINS UDP communication library"
 readme = "README.md"
 authors = [{ name = "Okita Systam Design" }]
