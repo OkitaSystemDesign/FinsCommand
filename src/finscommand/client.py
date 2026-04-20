@@ -2,9 +2,12 @@ from datetime import datetime
 from socket import *
 import struct
 import time
+import logging
 from .errors import FinsResponseError
 
 BUFSIZE = 4096
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 class fins:
     addr = ()
@@ -23,6 +26,9 @@ class fins:
             self.destfins[1] = self.hostadr[3]
 
         self.srcfins = srcfinsadr.split('.')
+
+    def __del__(self):
+        self.sock.cloase()
 
     def offset(self, adr, offset):
         mtype = adr[:1]
@@ -61,6 +67,26 @@ class fins:
         ary[9] = 0x00                       # SID
 
         return ary
+
+
+    # Send fins command 
+    def SendCommand(self, FinsCommand):
+        finsFrame = self.finsheader() + FinsCommand
+
+        # 送信ログ
+        logger.debug(f"Send: {finsFrame.hex()}")
+
+        self.sock.sendto(finsFrame, self.addr)
+        readdata = self.sock.recv(BUFSIZE)
+
+        # 受信ログ
+        logger.debug(f"Recv: {readdata.hex()}")
+        
+        if not(readdata[12] == 0 and readdata[13] == 0):
+            raise(FinsResponseError(readdata[12:14]))
+
+        return readdata
+
 
     # Memory area read
     def read(self, memaddr, readsize):
@@ -159,7 +185,7 @@ class fins:
                 wdary.append(memoffset[1])
                 wdary.append(0x00)
 
-        s = socket(AF_INET, SOCK_DGRAM)
+        #s = socket(AF_INET, SOCK_DGRAM)
         #s.settimeout(2)
 
         finsFrame = self.finsheader()
@@ -322,24 +348,6 @@ class fins:
         finsres = rcv[10:]
 
         return finsres
-
-
-    # Send fins command 
-    def SendCommand(self, FinsCommand):
-        s = socket(AF_INET, SOCK_DGRAM)
-        #s.settimeout(2)
-
-        finsFrame = self.finsheader() + FinsCommand
-
-        s.sendto(finsFrame, self.addr)
-        readdata = s.recv(BUFSIZE)
-
-        s.close()
-
-        if not(readdata[12] == 0 and readdata[13] == 0):
-            raise(FinsResponseError(readdata[12:14]))
-
-        return readdata
 
 
     def toBin(self, data):

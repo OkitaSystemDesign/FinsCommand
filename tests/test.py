@@ -1,12 +1,12 @@
 from datetime import datetime
-from finsudp import fins
+from finscommand import fins
 
 if __name__ == "__main__":
     # Sample
     try:
         # インスタンス作成
         # NXではポート2を使用
-        finsudp = fins('192.168.251.1')   #接続先IPアドレス, 接続先FINSアドレス, 自分FINSアドレス
+        finsudp = fins('192.168.251.1', 2.0)   #接続先IPアドレス, 接続先FINSアドレス, 自分FINSアドレス
 
         # 0CHから1CH分読出し  ビット表記
         data = finsudp.read('0', 1)
