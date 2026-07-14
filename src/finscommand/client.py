@@ -28,7 +28,7 @@ class fins:
         self.srcfins = srcfinsadr.split('.')
 
     def __del__(self):
-        self.sock.cloase()
+        self.sock.close()
 
     def offset(self, adr, offset):
         mtype = adr[:1]
